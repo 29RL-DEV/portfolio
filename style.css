@@ -1,3 +1,4 @@
+
 /* ============================================
     VARIABLES & RESET
     ============================================ */
@@ -199,32 +200,21 @@ section {
 }
 
 .hero-code {
-  background: linear-gradient(
-    180deg,
-    rgba(31, 167, 102, 0.15),
-    rgba(7, 8, 7, 1)
-  );
-  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 16px;
-  padding: 24px;
   font-family: "JetBrains Mono", monospace;
   font-size: 1.1rem;
   line-height: 1.5;
-  box-shadow: var(--glow);
   position: relative;
-  height: fit-content;
-  align-self: start;
   max-width: 550px;
   margin-left: auto;
+  min-height: 260px;
+  perspective: 1200px;
+  overflow: hidden;
 }
 
-.hero-code::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgba(5, 8, 6, 0.85);
-  border-radius: 16px;
-}
+
+/* ===== HERO CODE 3D FLIP ===== */
+
 
 .hero-code code {
   position: relative;
@@ -368,8 +358,9 @@ section {
 .project-footer {
   display: flex;
   flex-direction: column;
-  gap: 22px;
+  gap: 28px;
   margin-top: auto;
+  padding-top: 14px;
   padding-bottom: 4px;
 }
 
@@ -614,6 +605,8 @@ section {
     margin-left: 0;
     width: 100%;
     margin-top: 32px;
+    transition: transform 0.8s ease;
+    perspective: 1200px;
   }
 }
 
@@ -667,7 +660,7 @@ section {
 
   .project-footer {
     margin-top: 12px;
-    gap: 6px;
+    gap: 28px;
   }
 
   .project-cta {
@@ -688,4 +681,52 @@ section {
   .container {
     max-width: 1400px;
   }
+}
+
+/* last edit */
+
+.decode-cursor::after {
+  content: "▍";
+  margin-left: 2px;
+  animation: blink 1s steps(1) infinite;
+  color: #00f6ff;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+
+.hero-code-inner {
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 1s ease, filter 1s ease;
+  filter: blur(12px);
+  background: #0a0a0a;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+
+
+.hero-code.is-flipped .hero-code-inner {
+  transform: rotateY(180deg);
+  filter: blur(0);
+}
+
+
+.hero-code.is-paused {
+  pointer-events: none;
+}
+
+.hero-code code {
+  display: block;
+  backface-visibility: hidden;
+  transform: rotateY(180deg);
 }

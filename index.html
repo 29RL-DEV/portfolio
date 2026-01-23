@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Robert Lisita | Junior Full-Stack Developer</title>
+
+    <meta name="description"
+        content="Junior full-stack developer focused on building and understanding real web systems, from frontend interfaces to backend logic, data flow and integrations. Interested in practical problem solving, SaaS products and AI-assisted development.">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body id="home">
+
+    <!-- NAV -->
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="#home" class="logo">RL<span>.DEV</span></a>
+            <button class="menu-toggle" aria-expanded="false" aria-label="Open menu">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <ul class="nav-links">
+                <li><a href="#projects">Projects</a></li>
+                <li><a href="#skills">Skills</a></li>
+                <li><a href="#contact">Contact</a></li>
+
+                <li>
+                    <a href="https://app.cal.eu/rl-dev/30min?overlayCalendar=true" target="_blank" rel="noopener"
+                        class="nav-cta">
+                        Book a Call
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="container hero-grid">
+
+            <div class="hero-text">
+                <h1>Robert Lisita</h1>
+                <h2>Junior Full-Stack Developer</h2>
+
+                <p>
+                    I’m a junior full-stack developer focused on understanding how real web applications work
+                    end to end - from frontend interfaces and user flows to backend logic, data handling and
+                    third-party integrations. I’m particularly interested in systems that solve practical
+                    problems rather than isolated features.
+                </p>
+
+                <p>
+                    Most of my experience comes from through academic study on real applications, where I’ve
+                    had to think about architecture, data flow, authentication and external services, not just
+                    how things look on the screen.
+                </p>
+
+                <p class="hero-sub">
+                    Currently exploring SaaS-style systems, AI-assisted development and scalable web
+                    architectures.
+                </p>
+
+                <a href="#projects" class="btn primary">View Projects</a>
+            </div>
+
+            <div class="hero-code">
+                <div class="hero-code-inner">
+
+                    <div class="hero-code-back">
+                        <pre><code></code></pre>
+                        <button class="flip-button" aria-label="View solution">
+                            <span>View Solution</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+
+                    <div class="hero-code-front">
+                        <pre><code class="hero-code-front-text"></code></pre>
+                        <button class="flip-button-front" aria-label="Go back">
+                            <i class="fas fa-arrow-left"></i>
+                            <span>Go Back</span>
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- PROJECTS -->
+    <section id="projects">
+        <div class="container">
+            <h2 class="section-title">Projects</h2>
+
+            <div class="projects-grid">
+
+                <!-- AI AGENT -->
+                <div class="project-card private-card">
+                    <h3>AI Agent Demo</h3>
+                    <p>
+                        An experimental AI developer assistant built to explore how AI agents can reason
+                        about programming tasks. The focus is on task decomposition, structured reasoning
+                        and analysis-driven workflows, rather than blind automation or code generation.
+                    </p>
+                    <p class="tech">Node.js · OpenAI API · Prompt Engineering · AI Agents</p>
+                    <div class="project-footer">
+                        <span class="badge private-badge">🔒 Developer Experiment</span>
+                        <a href="#contact" class="project-cta">🔒 Request Access</a>
+                    </div>
+                </div>
+
+                <!-- SAAS -->
+                <div class="project-card business-card">
+                    <h3>SaaS Starter Platform</h3>
+                    <p>
+                        A full-stack SaaS platform built to model how real subscription-based products work.
+                        Includes authentication, protected dashboards and live Stripe subscription flows
+                        with webhooks and billing logic. Designed as a functional SaaS foundation rather
+                        than a UI-only demo.
+                    </p>
+                    <p class="tech">React · Supabase · Stripe · Serverless · SaaS Architecture</p>
+                    <div class="project-footer">
+                        <span class="badge demo-badge">🟡 Live App</span>
+                        <a href="https://saas-rho-one.vercel.app/" class="project-cta">Open App</a>
+                    </div>
+                </div>
+
+                <!-- TODO -->
+                <div class="project-card business-card">
+                    <h3>To-Do Manager App</h3>
+                    <p>
+                        A full-stack task management application with authentication and persistent storage.
+                        Each user manages their own data through a clean CRUD interface, built to practice
+                        secure data access, state management and real frontend–backend integration.
+                    </p>
+                    <p class="tech">React · Supabase · Authentication · CRUD · Vercel</p>
+                    <div class="project-footer">
+                        <span class="badge live-badge">🟢 Live App</span>
+                        <a href="https://to-do-manager-seven.vercel.app/" class="project-cta">Open App</a>
+                    </div>
+                </div>
+
+                <!-- WEATHER -->
+                <div class="project-card demo-card">
+                    <h3>Weather App</h3>
+                    <p>
+                        A lightweight and responsive frontend application that fetches and displays
+                        real-time weather data from a public API. Built to practice async data handling,
+                        API integration and clean UI state updates.
+                    </p>
+                    <p class="tech">JavaScript · REST API · Frontend · API Integration</p>
+                    <div class="project-footer">
+                        <span class="badge demo-badge">🟢 Live Demo</span>
+                        <a href="./projects/weather-app/" class="project-cta">Open Demo</a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- SKILLS -->
+    <section id="skills">
+        <div class="container">
+            <h2 class="section-title">Skills</h2>
+
+            <div class="skills-grid">
+                <div class="skill-box">
+                    <h3>AI & Automation</h3>
+                    <ul>
+                        <li>LLM-assisted code analysis</li>
+                        <li>AI-supported debugging workflows</li>
+                        <li>Developer productivity tooling</li>
+                    </ul>
+                </div>
+
+                <div class="skill-box">
+                    <h3>Full-Stack & SaaS</h3>
+                    <ul>
+                        <li>Authentication & user systems</li>
+                        <li>REST APIs & databases</li>
+                        <li>SaaS architecture fundamentals</li>
+                    </ul>
+                </div>
+
+                <div class="skill-box">
+                    <h3>Web Development</h3>
+                    <ul>
+                        <li>Backend development</li>
+                        <li>Modern frontend interfaces</li>
+                        <li>Secure data handling</li>
+                        <li>Cloud deployments</li>
+                    </ul>
+                </div>
+
+                <div class="skill-box">
+                    <h3>Software Engineering</h3>
+                    <ul>
+                        <li>Modular application design</li>
+                        <li>Practical AI integration</li>
+                        <li>Version control & testing</li>
+                        <li>Maintainable codebases</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact">
+        <div class="container">
+            <h2 class="section-title">Let's Connect</h2>
+
+            <div class="contact-icons">
+                <a href="https://github.com/29RL-DEV" target="_blank" rel="noopener" class="contact-icon">
+                    <i class="fab fa-github"></i><span>GitHub</span>
+                </a>
+                <a href="https://linkedin.com/in/robertlisita" target="_blank" rel="noopener" class="contact-icon">
+                    <i class="fab fa-linkedin"></i><span>LinkedIn</span>
+                </a>
+                <a href="https://mail.google.com/mail/?view=cm&fs=1&to=29rl.dev@gmail.com" target="_blank"
+                    rel="noopener" class="contact-icon">
+                    <i class="fas fa-envelope"></i><span>Email</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        © <span id="currentYear">2026</span> <a href="#home" class="logo">RL<span>.DEV</span></a>
+    </footer>
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>

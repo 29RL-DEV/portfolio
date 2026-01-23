@@ -3,7 +3,6 @@
  * Handles search history and user preferences
  */
 
-// #keys
 const STORAGE_KEYS = {
   SEARCH_HISTORY: "weatherapp_search_history",
   TEMPERATURE_UNIT: "weatherapp_temp_unit",
@@ -11,7 +10,10 @@ const STORAGE_KEYS = {
   LAST_COORDS: "weatherapp_last_coords",
 };
 
-// #search_history
+/**
+ * Get search history from localStorage
+ * @returns {Array} Array of city search strings
+ */
 export function getSearchHistory() {
   try {
     const history = localStorage.getItem(STORAGE_KEYS.SEARCH_HISTORY);
@@ -22,15 +24,18 @@ export function getSearchHistory() {
   }
 }
 
-// #add_history
+/**
+ * Add city to search history (max 10 recent)
+ * @param {string} city - City display name
+ */
 export function addToSearchHistory(city) {
   try {
     let history = getSearchHistory();
-    // #dedupe
+    // Remove duplicate if exists
     history = history.filter((c) => c !== city);
-    // #push_front
+    // Add to front
     history.unshift(city);
-    // #max_10
+    // Keep only 10 most recent
     history = history.slice(0, 10);
     localStorage.setItem(STORAGE_KEYS.SEARCH_HISTORY, JSON.stringify(history));
   } catch (err) {
@@ -38,7 +43,10 @@ export function addToSearchHistory(city) {
   }
 }
 
-// #get_unit
+/**
+ * Get user's temperature unit preference
+ * @returns {boolean} true for Celsius, false for Fahrenheit
+ */
 export function getTemperatureUnit() {
   try {
     const unit = localStorage.getItem(STORAGE_KEYS.TEMPERATURE_UNIT);
@@ -52,7 +60,10 @@ export function getTemperatureUnit() {
 /**
  * Set user's temperature unit preference
  * @param {boolean} isCelsius - true for Celsius, false for Fahrenheit
- / #set_unit localStorage.setItem(
+ */
+export function setTemperatureUnit(isCelsius) {
+  try {
+    localStorage.setItem(
       STORAGE_KEYS.TEMPERATURE_UNIT,
       isCelsius ? "celsius" : "fahrenheit"
     );
@@ -72,7 +83,7 @@ export function saveLastCity(city, lat, lon) {
     localStorage.setItem(STORAGE_KEYS.LAST_CITY, city);
     localStorage.setItem(
       STORAGE_KEYS.LAST_COORDS,
-      JSON.stringify({ lat, lon }),
+      JSON.stringify({ lat, lon })
     );
   } catch (err) {
     console.error("Failed to save last city:", err);

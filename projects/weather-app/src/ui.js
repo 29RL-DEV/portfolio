@@ -2,10 +2,11 @@
  * UI Module - Handles all DOM manipulation and user interface
  */
 
-// Șterge sau comentează importul dacă nu folosești getWeatherIcon
-// import { getWeatherIcon } from "./api.js";
-
-// #format
+/**
+ * Format date to readable string
+ * @param {Date} date - Date object
+ * @returns {string} Formatted date string
+ */
 export function formatDate(date) {
   const options = {
     weekday: "long",
@@ -16,7 +17,10 @@ export function formatDate(date) {
   return date.toLocaleDateString("en-US", options);
 }
 
-// #spinner
+/**
+ * Show or hide loading spinner
+ * @param {boolean} show - True to show, false to hide
+ */
 export function showSpinner(show) {
   const spinner = document.getElementById("loadingSpinner");
   if (show) {
@@ -38,7 +42,9 @@ export function showErrorMsg(message) {
   errorBox.classList.remove("hidden");
 }
 
-// #hide_error
+/**
+ * Hide error message
+ */
 export function hideError() {
   const errorBox = document.getElementById("errorMessage");
   errorBox.classList.add("hidden");
@@ -64,7 +70,11 @@ export function showData(show) {
   }
 }
 
-// #suggestions
+/**
+ * Display city suggestions
+ * @param {Array} cities - Array of city objects
+ * @param {Function} onSelect - Callback when city is selected
+ */
 export function displaySuggestions(cities, onSelect) {
   const cityList = document.getElementById("suggestions");
   cityList.innerHTML = "";
@@ -75,7 +85,7 @@ export function displaySuggestions(cities, onSelect) {
     return;
   }
 
-  // #max_8
+  // Show max 8 results
   cities.slice(0, 8).forEach((city) => {
     const li = document.createElement("li");
     const display = `${city.name}${city.state ? ", " + city.state : ""}, ${
@@ -94,7 +104,9 @@ export function displaySuggestions(cities, onSelect) {
   });
 }
 
-// #clear_suggestions
+/**
+ * Clear suggestions list
+ */
 export function clearSuggestions() {
   const cityList = document.getElementById("suggestions");
   cityList.innerHTML = "";
@@ -102,18 +114,22 @@ export function clearSuggestions() {
 
 /**
  * Display current weather information
+ * @param {Object} data - Weather data from API
+ * @param {string} cityName - City display name
+ * @param {boolean} isCelsius - Temperature unit
  */
 export function displayCurrentWeather(data, cityName, isCelsius) {
   const current = data.current;
   const daily = data.daily;
 
+  // Get weather info (will be imported from api module)
   // Temp conversion
   const tempC = Math.round(current.temperature_2m);
   const temp = isCelsius ? tempC : Math.round((tempC * 9) / 5 + 32);
   const feelsC = Math.round(current.apparent_temperature);
   const feels = isCelsius ? feelsC : Math.round((feelsC * 9) / 5 + 32);
 
-  // #convert_temp
+  // Display current weather
   document.getElementById("cityName").textContent = cityName;
   document.getElementById("weatherDate").textContent = formatDate(new Date());
   document.getElementById("temperature").textContent = temp;
@@ -121,7 +137,7 @@ export function displayCurrentWeather(data, cityName, isCelsius) {
   document.getElementById("humidity").textContent =
     current.relative_humidity_2m + "%";
   document.getElementById("pressure").textContent =
-    Math.round(current.pressure_msl) + " hPa";
+    (current.pressure_msl / 100).toFixed(0) + " hPa";
   document.getElementById("visibility").textContent =
     (current.visibility / 1000).toFixed(1) + " km";
 
@@ -135,12 +151,17 @@ export function displayCurrentWeather(data, cityName, isCelsius) {
   document.getElementById("minTemp").textContent = minTemp + "°";
 }
 
-// #forecast
+/**
+ * Display 5-day forecast
+ * @param {Object} data - Weather data from API
+ * @param {boolean} isCelsius - Temperature unit
+ */
 export function displayForecast(data, isCelsius) {
   const daily = data.daily;
   const forecastContainer = document.getElementById("forecastContainer");
   forecastContainer.innerHTML = "";
 
+  // Show 5 days
   for (let i = 1; i < 6; i++) {
     const date = new Date();
     date.setDate(date.getDate() + i);

@@ -1,70 +1,127 @@
 /**
- * API Module
- * Handles all external API calls (Geocoding + Weather)
- * Uses Open-Meteo APIs (free, no key required)
+ * API Module - Handles all external API calls
+ * Uses Open-Meteo (weather) and Nominatim (geocoding)
  */
 
-// 🌍 Geocoding (city search)
-const GEO_URL = "https://geocoding-api.open-meteo.com/v1/search";
-
-// 🌦️ Weather forecast
-const WEATHER_URL = "https://api.open-meteo.com/v1/forecast";
+const WEATHER_API = "https://api.open-meteo.com/v1";
+const GEOCODING_API = "https://nominatim.openstreetmap.org/search";
 
 /**
- * Search cities by name
- * @param {string} query
- * @param {AbortSignal} [signal]
- * @returns {Promise<Array>}
+ * Fetch cities from Nominatim geocoding service
+ * @param {string} query - City search query
+ * @param {AbortSignal} signal - Abort signal for request cancellation
+ * @returns {Promise<Array>} Array of city objects with name, lat, lon, country, state
  */
-export async function searchCities(query, signal) {
-  const url = `${GEO_URL}?name=${encodeURIComponent(
-    query,
-  )}&count=10&language=en&format=json`;
-
-  const res = await fetch(url, { signal });
-
-  if (!res.ok) {
-    throw new Error("Failed to fetch city data");
+export async function searchCities(query, signal = null) {
+  if (!query || query.trim().length === 0) {
+    return [];
   }
 
-  const data = await res.json();
-  return data.results || [];
+  try {
+    const url = `${GEOCODING_API}?q=${encodeURIComponent(
+      query
+    )}&format=json&limit=8&addressdetails=1&accept-language=en`;
+
+    const fetchOptions = {
+      headers: {
+        "Accept-Language": "en",
+      },
+    };
+
+    if (signal) {
+      fetchOptions.signal = signal;
+    }
+
+    const response = await fetch(url, fetchOptions);
+
+    if (!response.ok) {
+      if (response.status === 429) {
+        throw new Error(
+          "Too many requests. Please wait a moment and try again."
+        );
+      }
+      throw new Error(`Server error (${response.status}). Try again later.`);
+    }
+
+    const data = await response.json();
+
+    // Transform Nominatim response to our format
+    return data.map((city) => {
+      const address = city.address || {};
+      let country = address.country || "";
+
+      if (!country && city.display_name) {
+        const parts = city.display_name.split(",");
+        if (parts.length > 1) {
+          country = parts[parts.length - 1].trim();
+        }
+      }
+
+      const state = address.state || "";
+      const cityName =
+        address.city || address.town || address.village || city.name || "";
+
+      return {
+        name: cityName,
+        lat: parseFloat(city.lat),
+        lon: parseFloat(city.lon),
+        country: country || "World",
+        state: state,
+      };
+    });
+  } catch (err) {
+    console.error("City search failed:", err);
+    throw err;
+  }
 }
 
 /**
- * Fetch weather data by coordinates
- * Returns data structured EXACTLY as your UI expects:
- *  - data.current.temperature_2m
- *  - data.current.apparent_temperature
- *  - data.current.relative_humidity_2m
- *  - data.current.pressure_msl
- *  - data.current.visibility
- *  - data.daily.temperature_2m_max
- *  - data.daily.temperature_2m_min
- *
- * @param {number} lat
- * @param {number} lon
- * @returns {Promise<Object>}
+ * Fetch weather data for given coordinates
+ * @param {number} lat - Latitude
+ * @param {number} lon - Longitude
+ * @returns {Promise<Object>} Weather data object
  */
 export async function fetchWeatherByCoords(lat, lon) {
-  const url = `${WEATHER_URL}?latitude=${lat}&longitude=${lon}&timezone=auto&current=temperature_2m,apparent_temperature,relative_humidity_2m,pressure_msl,visibility&daily=temperature_2m_max,temperature_2m_min`;
+  try {
+    // Check internet connection first
+    if (!navigator.onLine) {
+      throw new Error("No internet connection. Check your network.");
+    }
 
-  const res = await fetch(url);
+    const url = `${WEATHER_API}/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,pressure_msl,visibility,temperature_2m_max,temperature_2m_min&hourly=temperature_2m&daily=temperature_2m_max,temperature_2m_min,weather_code&timezone=auto`;
 
-  if (!res.ok) {
-    throw new Error("Failed to fetch weather data");
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      throw new Error("Unable to fetch weather. Try again later.");
+    }
+
+    const data = await response.json();
+
+    if (!data.current) {
+      throw new Error("Invalid weather data received.");
+    }
+
+    return data;
+  } catch (err) {
+    console.error("Weather fetch error:", err);
+    throw err;
   }
-
-  return await res.json();
 }
 
 /**
- * Get human-readable weather description
- * (Open-Meteo uses weather codes; this is optional but kept
- * because app.js imports it)
- *
- * @param {number} code
- * @returns {string}
+ * Convert temperature from Celsius to Fahrenheit
+ * @param {number} celsius - Temperature in Celsius
+ * @returns {number} Temperature in Fahrenheit
+ */
+export function celsiusToFahrenheit(celsius) {
+  return Math.round((celsius * 9) / 5 + 32);
+}
+
+/**
+ * Get weather description from WMO weather code
+ * @param {number} code - WMO weather code
+ * @returns {string} Weather description
  */
 export function getWeatherDescription(code) {
   const descriptions = {
@@ -72,8 +129,8 @@ export function getWeatherDescription(code) {
     1: "Mainly clear",
     2: "Partly cloudy",
     3: "Overcast",
-    45: "Fog",
-    48: "Depositing rime fog",
+    45: "Foggy",
+    48: "Rime fog",
     51: "Light drizzle",
     53: "Moderate drizzle",
     55: "Dense drizzle",
@@ -83,25 +140,31 @@ export function getWeatherDescription(code) {
     71: "Slight snow",
     73: "Moderate snow",
     75: "Heavy snow",
+    80: "Slight rain showers",
+    81: "Moderate rain showers",
+    82: "Violent rain showers",
+    85: "Slight snow showers",
+    86: "Heavy snow showers",
     95: "Thunderstorm",
+    96: "Thunderstorm with slight hail",
+    99: "Thunderstorm with heavy hail",
   };
-
-  return descriptions[code] || "Unknown weather";
+  return descriptions[code] || "Unknown";
 }
 
 /**
- * Get weather icon (emoji-based fallback)
- * Kept for compatibility with existing imports
- *
- * @param {number} code
- * @returns {string}
+ * Get emoji weather icon from WMO weather code
+ * @param {number} code - WMO weather code
+ * @returns {string} Weather emoji
  */
 export function getWeatherIcon(code) {
-  if (code === 0) return "☀️";
-  if (code <= 2) return "⛅";
-  if (code <= 3) return "☁️";
-  if (code >= 51 && code <= 67) return "🌧️";
-  if (code >= 71 && code <= 77) return "❄️";
-  if (code >= 95) return "⛈️";
-  return "🌡️";
+  if (code === 0 || code === 1) return "☀️";
+  if (code === 2) return "🌤️";
+  if (code === 3) return "☁️";
+  if ([45, 48].includes(code)) return "🌫️";
+  if ([51, 53, 55].includes(code)) return "🌧️";
+  if ([61, 63, 65, 80, 81, 82].includes(code)) return "🌧️";
+  if ([71, 73, 75, 85, 86].includes(code)) return "❄️";
+  if ([95, 96, 99].includes(code)) return "⛈️";
+  return "🌤️";
 }

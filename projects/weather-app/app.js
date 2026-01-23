@@ -40,7 +40,6 @@ import {
 let useCelsius = getTemperatureUnit();
 let searchTimeout;
 let searchAbortController = null;
-let currentCityData = null;
 
 // DOM elements
 const btn = document.getElementById("searchBtn");
@@ -48,28 +47,15 @@ const input = document.getElementById("searchInput");
 const switchUnitBtn = document.getElementById("toggleUnit");
 const homeBtn = document.getElementById("homeBtn");
 const errorCloseBtn = document.getElementById("errorCloseBtn");
-const searchForm = document.getElementById("searchForm");
 
 /**
- * #init
+ * Initialize application
  */
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("WeatherSync initialized");
-
-  // #listeners
+  // Event listeners
   btn.addEventListener("click", handleSearch);
-
-  // Fix pentru form submit
-  searchForm.addEventListener("submit", (e) => {
-    e.preventDefault();
-    handleSearch();
-  });
-
   input.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      handleSearch();
-    }
+    if (e.key === "Enter") handleSearch();
   });
 
   input.addEventListener("input", handleInputChange);
@@ -84,22 +70,19 @@ document.addEventListener("DOMContentLoaded", () => {
     errorCloseBtn.addEventListener("click", hideError);
   }
 
-  // #click_outside
+  // Close suggestions when clicking outside
   document.addEventListener("click", (e) => {
     if (!e.target.closest(".search")) {
       clearSuggestions();
     }
   });
 
-  // #focus
-  focusSearchInput();
 
-  // Load last viewed city if exists
-  loadLastCity();
-});
+  focusSearchInput();
+})
 
 /**
- * #search_input
+ * Handle search input changes
  */
 async function handleInputChange(e) {
   const query = e.target.value.trim();
@@ -117,18 +100,18 @@ async function handleInputChange(e) {
 
   clearTimeout(searchTimeout);
 
-  // #searching
+  // Show "Searching..." message immediately
   const suggestions = document.getElementById("suggestions");
   suggestions.innerHTML =
     '<li style="color: var(--muted); font-style: italic;">🔍 Searching...</li>';
 
-  // #debounce
+  // Debounce: wait 300ms before API call
   searchTimeout = setTimeout(async () => {
     try {
       const cities = await searchCities(query, searchAbortController.signal);
       displaySuggestions(cities, selectCity);
     } catch (err) {
-      // Don't show error if request was aborted (user typed more)
+      // Don't show error if request was aborted 
       if (err.name !== "AbortError") {
         suggestions.innerHTML =
           '<li style="color: var(--danger);">⚠️ Error loading suggestions</li>';
@@ -137,7 +120,9 @@ async function handleInputChange(e) {
   }, 300);
 }
 
-/* #search_button */
+/**
+ * Handle search button click
+ */
 async function handleSearch() {
   const query = getSearchInput();
 
@@ -156,71 +141,45 @@ async function handleSearch() {
     if (!cities || cities.length === 0) {
       showErrorMsg("City not found. Try another search.");
       showData(false);
-      showSpinner(false);
       return;
     }
 
-    const firstCity = cities[0];
-    const displayName = firstCity.name
-      ? `${firstCity.name}${firstCity.state ? ", " + firstCity.state : ""}, ${firstCity.country}`
-      : query;
-
-    currentCityData = {
-      city: firstCity.name || query,
-      lat: firstCity.lat,
-      lon: firstCity.lon,
-      country: firstCity.country,
-    };
-
-    await selectCity(firstCity, displayName);
+    displaySuggestions(cities, selectCity);
   } catch (err) {
     showErrorMsg("Error: " + (err.message || "Unable to search cities"));
     showData(false);
+  } finally {
     showSpinner(false);
   }
 }
 
 /**
- * #city_selection
+ * Handle city selection from suggestions
  */
 async function selectCity(city, displayName) {
   setSearchInput(displayName);
   hideError();
   showSpinner(true);
 
-  currentCityData = {
-    city: city.name || displayName.split(",")[0],
-    lat: city.lat,
-    lon: city.lon,
-    country: city.country || "Unknown",
-  };
-
   try {
-    // #fetch_weather
+    // Fetch weather for selected city
     const weatherData = await fetchWeatherByCoords(city.lat, city.lon);
 
-    // #display
+    // Display weather
     displayCurrentWeather(weatherData, displayName, useCelsius);
     displayForecast(weatherData, useCelsius);
 
-    // #map
+    // Load map
     const temp = useCelsius
       ? Math.round(weatherData.current.temperature_2m)
       : Math.round((weatherData.current.temperature_2m * 9) / 5 + 32);
     updateWeatherMap(city.lat, city.lon, temp);
 
-    // #show_data
+    // Show data sections
     showData(true);
 
-    // #history
+    // Save only in search history
     addToSearchHistory(displayName);
-    saveLastCity(
-      currentCityData.city,
-      currentCityData.lat,
-      currentCityData.lon,
-    );
-
-    console.log("Weather loaded for:", displayName);
   } catch (err) {
     showErrorMsg(err.message || "Could not fetch weather data");
     showData(false);
@@ -230,28 +189,25 @@ async function selectCity(city, displayName) {
 }
 
 /**
- * #temperature_toggle
+ * Handle temperature unit toggle
  */
 function handleUnitToggle() {
   useCelsius = !useCelsius;
   setTemperatureUnit(useCelsius);
   updateUnitDisplay(useCelsius);
 
-  // #refresh - folosește orașul curent sau ultimul salvat
-  const cityData = currentCityData || getLastCity();
-  if (cityData && cityData.lat && cityData.lon) {
+  // Refresh current weather display with new unit
+  const lastCityData = getLastCity();
+  if (lastCityData) {
     showSpinner(true);
-    fetchWeatherByCoords(cityData.lat, cityData.lon)
+    fetchWeatherByCoords(lastCityData.lat, lastCityData.lon)
       .then((data) => {
-        const displayName = cityData.city
-          ? `${cityData.city}, ${cityData.country || ""}`
-          : "Current Location";
-        displayCurrentWeather(data, displayName, useCelsius);
+        displayCurrentWeather(data, lastCityData.city, useCelsius);
         displayForecast(data, useCelsius);
         const temp = useCelsius
           ? Math.round(data.current.temperature_2m)
           : Math.round((data.current.temperature_2m * 9) / 5 + 32);
-        updateWeatherMap(cityData.lat, cityData.lon, temp);
+        updateWeatherMap(lastCityData.lat, lastCityData.lon, temp);
       })
       .catch((err) => showErrorMsg(err.message))
       .finally(() => showSpinner(false));
@@ -259,42 +215,13 @@ function handleUnitToggle() {
 }
 
 /**
- * Load last viewed city on app start
+ * Load and display last viewed city on app start
  */
-async function loadLastCity() {
-  const lastCity = getLastCity();
-  if (lastCity && lastCity.lat && lastCity.lon) {
-    try {
-      showSpinner(true);
-      const weatherData = await fetchWeatherByCoords(
-        lastCity.lat,
-        lastCity.lon,
-      );
-      const displayName = lastCity.city
-        ? `${lastCity.city}, ${lastCity.country || ""}`
-        : "Saved Location";
-
-      displayCurrentWeather(weatherData, displayName, useCelsius);
-      displayForecast(weatherData, useCelsius);
-      updateWeatherMap(
-        lastCity.lat,
-        lastCity.lon,
-        useCelsius
-          ? Math.round(weatherData.current.temperature_2m)
-          : Math.round((weatherData.current.temperature_2m * 9) / 5 + 32),
-      );
-      showData(true);
-      currentCityData = lastCity;
-    } catch (err) {
-      console.log("Could not load last city:", err.message);
-    } finally {
-      showSpinner(false);
-    }
-  }
+function loadLastCity() {
 }
 
 /**
- * #map_display
+ * Display Windy weather map iframe
  */
 function updateWeatherMap(lat, lon, temp) {
   const mapContainer = document.getElementById("map");
@@ -305,7 +232,6 @@ function updateWeatherMap(lat, lon, temp) {
     '<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: var(--muted); font-style: italic;">Loading weather map...</div>';
 
   setTimeout(() => {
-    // #windymap
     const windyUrl = `https://embed.windy.com/embed2.html?lat=${lat}&lon=${lon}&zoom=10&level=surface&overlay=wind&product=ecmwf&message=true`;
 
     const iframe = document.createElement("iframe");

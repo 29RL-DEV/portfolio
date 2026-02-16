@@ -25,34 +25,18 @@
     <script>
         (function () {
             // Google Apps Script webhook URL - sends visit data to Telegram
-            const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbz8ZGrGIyIqq9Wm57wMg5TPzpH7R4cpLQSrhGf9tOGvlg5G24lWSjwKGRK2UXh3ruU7NQ/exec";
+            const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbzL8l38OgJXLDNREsiaaxughe0kngNUfqQHpDqSnt9FONyjZuXL2iGShpQpZda_GDCSMQ/exec";
 
             // Function to track and send visitor info
             async function trackVisit() {
                 try {
-                    // Collect basic info about the visitor
+                    // Only send device type - Google Apps Script will get location server-side
                     const data = {
-                        timestamp: new Date().toISOString(),
                         device: /Mobile|Android|iPhone/.test(navigator.userAgent) ? "Mobile" : "Desktop",
-                        country: "Unknown",
-                        city: "Unknown",
-                        region: "Unknown",
-                        ip: "Unknown"
+                        timestamp: new Date().toISOString()
                     };
 
-                    // Get visitor's location using IP geolocation API
-                    try {
-                        const ipResponse = await fetch('https://freeipapi.com/api/json', { signal: AbortSignal.timeout(3000) });
-                        const ipData = await ipResponse.json();
-                        data.country = ipData.countryName || "Unknown";
-                        data.city = ipData.cityName || "Unknown";
-                        data.region = ipData.regionName || "Unknown";
-                        data.ip = ipData.ipAddress || "Unknown";
-                    } catch (e) {
-                        // If geolocation fails, keep default "Unknown" values
-                    }
-
-                    // Send the data to Google Apps Script which forwards to Telegram
+                    // Send to Google Apps Script which will get IP and location
                     await fetch(WEBHOOK_URL, {
                         method: 'POST',
                         body: JSON.stringify(data),
@@ -60,7 +44,6 @@
                     });
                 } catch (err) {
                     // Silently fail if tracking doesn't work
-                    console.error('Tracking error');
                 }
             }
 

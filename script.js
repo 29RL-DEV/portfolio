@@ -1,9 +1,9 @@
-/* Detect mobile devices - UI behavior only */
+// Check if user is on mobile or desktop
 function isMobileView() {
   return window.matchMedia("(max-width: 768px)").matches;
 }
 
-/* Decode Text Effect - Hero Code */
+// Random characters for the text decode animation
 const decodeChars =
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-={}[]<>?/";
 
@@ -38,7 +38,7 @@ function decodeText(element, finalText, speed = 30) {
   }, speed);
 }
 
-/* Hero Decode Control - Direct Show */
+// Tracks animation state for hero section
 let heroPlayed = false;
 let decodingFinished = false;
 let frontDecoded = false;
@@ -53,11 +53,11 @@ function playHeroAnimation() {
   heroPlayed = true;
   hasPlayedOnce = true;
 
-  // Show title immediately - STATIC
+  // Show the title right away - no animation
   const title = "AI Dev Agent — Developer Productivity Loop (Current)\n\n";
   backCodeEl.textContent = title;
 
-  // Wait 1.5 seconds, then decode the rest
+  // Wait a moment, then animate the rest of the text
   setTimeout(() => {
     const stepsText = `[1] Ingest repository and test results
 [2] Analyse failures and logs
@@ -68,15 +68,15 @@ function playHeroAnimation() {
 [7] Re-run tests
 [8] Produce reports and suggestions`;
 
-    // Reset decodeRunning to allow fresh decode
+    // Allow decode function to run again
     decodeRunning = false;
 
-    // Create temporary element for decoding only the steps
+    // Create temporary element to decode the steps text
     const tempEl = document.createElement("span");
 
     decodeText(tempEl, stepsText, 20);
 
-    // Update backCodeEl as decoding progresses
+    // Update the display as text is decoded
     const checkInterval = setInterval(() => {
       backCodeEl.textContent = title + tempEl.textContent;
 
@@ -84,7 +84,7 @@ function playHeroAnimation() {
         clearInterval(checkInterval);
         decodingFinished = true;
 
-        // Wait 1 seconds after decoding finishes before showing button
+        // Show the flip button after decoding finishes
         setTimeout(() => {
           const flipButton = document.querySelector(".flip-button");
           if (flipButton) {
@@ -443,4 +443,3 @@ if (document.readyState === "loading") {
 } else {
   initApp();
 }
-  

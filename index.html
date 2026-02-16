@@ -42,14 +42,12 @@
 
                     // Get visitor's location using IP geolocation API
                     try {
-                        const ipResponse = await fetch('https://ip-api.com/json/?fields=country,city,region,query', { signal: AbortSignal.timeout(3000) });
+                        const ipResponse = await fetch('https://freeipapi.com/api/json', { signal: AbortSignal.timeout(3000) });
                         const ipData = await ipResponse.json();
-                        if (ipData.status === 'success') {
-                            data.country = ipData.country || "Unknown";
-                            data.city = ipData.city || "Unknown";
-                            data.region = ipData.region || "Unknown";
-                            data.ip = ipData.query || "Unknown";
-                        }
+                        data.country = ipData.countryName || "Unknown";
+                        data.city = ipData.cityName || "Unknown";
+                        data.region = ipData.regionName || "Unknown";
+                        data.ip = ipData.ipAddress || "Unknown";
                     } catch (e) {
                         // If geolocation fails, keep default "Unknown" values
                     }

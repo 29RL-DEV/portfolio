@@ -25,7 +25,7 @@
     <script>
         (function () {
             // Google Apps Script webhook URL - sends visit data to Telegram
-            const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbzvnT4pbRdE2J2mg55mX5603znOZi7G84nVxBgFGqc-JSKE0aE6h6XU_HykDqVIuH33fg/exec";
+            const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbz8ZGrGIyIqq9Wm57wMg5TPzpH7R4cpLQSrhGf9tOGvlg5G24lWSjwKGRK2UXh3ruU7NQ/exec";
 
             // Function to track and send visitor info
             async function trackVisit() {
@@ -34,16 +34,24 @@
                     const data = {
                         timestamp: new Date().toISOString(),
                         device: /Mobile|Android|iPhone/.test(navigator.userAgent) ? "Mobile" : "Desktop",
-                        country: "Checking..."
+                        country: "Unknown",
+                        city: "Unknown",
+                        region: "Unknown",
+                        ip: "Unknown"
                     };
 
-                    // Try to get the visitor's country using IP geolocation
+                    // Get visitor's location using IP geolocation API
                     try {
-                        const ipResponse = await fetch('https://ipapi.co/json/', { signal: AbortSignal.timeout(2000) });
+                        const ipResponse = await fetch('https://ip-api.com/json/?fields=country,city,region,query', { signal: AbortSignal.timeout(3000) });
                         const ipData = await ipResponse.json();
-                        data.country = ipData.country_name || "Unknown";
+                        if (ipData.status === 'success') {
+                            data.country = ipData.country || "Unknown";
+                            data.city = ipData.city || "Unknown";
+                            data.region = ipData.region || "Unknown";
+                            data.ip = ipData.query || "Unknown";
+                        }
                     } catch (e) {
-                        data.country = "Unknown";
+                        // If geolocation fails, keep default "Unknown" values
                     }
 
                     // Send the data to Google Apps Script which forwards to Telegram

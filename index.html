@@ -25,25 +25,37 @@
     <script>
         (function () {
             // Google Apps Script webhook URL - sends visit data to Telegram
-            const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbzL8l38OgJXLDNREsiaaxughe0kngNUfqQHpDqSnt9FONyjZuXL2iGShpQpZda_GDCSMQ/exec";
+            const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbxJ-mILg8QACFX9aUpfPJ1ufTuYbpQrv3AHdnGoLXxqz9SqJlcTO2ZEWJG1cbLwVHt3AA/exec";
 
             // Function to track and send visitor info
             async function trackVisit() {
                 try {
-                    // Only send device type - Google Apps Script will get location server-side
                     const data = {
                         device: /Mobile|Android|iPhone/.test(navigator.userAgent) ? "Mobile" : "Desktop",
-                        timestamp: new Date().toISOString()
+                        city: "Unknown",
+                        country: "Unknown"
                     };
 
-                    // Send to Google Apps Script which will get IP and location
+                    // Get location using ipapi.is (free, HTTPS, no key needed)
+                    try {
+                        const response = await fetch('https://api.ipapi.is/', {
+                            signal: AbortSignal.timeout(3000)
+                        });
+                        const geo = await response.json();
+                        data.city = geo.location?.city || "Unknown";
+                        data.country = geo.location?.country || "Unknown";
+                    } catch (e) {
+                        // Keep Unknown if fails
+                    }
+
+                    // Send to Google Apps Script
                     await fetch(WEBHOOK_URL, {
                         method: 'POST',
                         body: JSON.stringify(data),
                         mode: 'no-cors'
                     });
                 } catch (err) {
-                    // Silently fail if tracking doesn't work
+                    // Silently fail
                 }
             }
 

@@ -641,6 +641,34 @@ section {
   color: var(--safe);
 }
 
+.production-card {
+  border-color: rgba(59, 130, 246, 0.6);
+  background:
+    radial-gradient(circle at top, rgba(59, 130, 246, 0.08), transparent 60%),
+    var(--panel);
+  box-shadow: 0 0 22px rgba(59, 130, 246, 0.15);
+  --accent: #3b82f6;
+}
+
+.production-card h3,
+.production-card .tech {
+  color: #3b82f6;
+}
+
+.instantfix-card {
+  border-color: #22d3ee;
+  background:
+    radial-gradient(circle at top, rgba(34, 211, 238, 0.08), transparent 60%),
+    var(--panel);
+  box-shadow: 0 0 20px rgba(34, 211, 238, 0.35);
+  --accent: #22d3ee;
+}
+
+.instantfix-card h3,
+.instantfix-card .tech {
+  color: #22d3ee;
+}
+
 /* Project card footer */
 .project-footer {
   display: flex;
@@ -688,6 +716,20 @@ section {
   box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 30%, transparent);
 }
 
+.production-badge {
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  color: var(--accent);
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+.instantfix-badge {
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  color: var(--accent);
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
 /* Project Actions */
 .project-cta {
   display: inline-flex;
@@ -729,6 +771,16 @@ section {
 .demo-card .project-cta {
   border-color: rgba(31, 167, 102, 0.5);
   color: var(--safe);
+}
+
+.production-card .project-cta {
+  border-color: rgba(59, 130, 246, 0.5);
+  color: #3b82f6;
+}
+
+.instantfix-card .project-cta {
+  border-color: rgba(34, 211, 238, 0.5);
+  color: #22d3ee;
 }
 
 .project-card:hover .project-cta {

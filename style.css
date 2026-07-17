@@ -669,6 +669,20 @@ section {
   color: #22d3ee;
 }
 
+.enterprise-card {
+  border-color: rgba(16, 185, 129, 0.6);
+  background:
+    radial-gradient(circle at top, rgba(16, 185, 129, 0.1), transparent 60%),
+    var(--panel);
+  box-shadow: 0 0 22px rgba(16, 185, 129, 0.2);
+  --accent: #10b981;
+}
+
+.enterprise-card h3,
+.enterprise-card .tech {
+  color: #10b981;
+}
+
 /* Project card footer */
 .project-footer {
   display: flex;
@@ -730,6 +744,13 @@ section {
   box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 25%, transparent);
 }
 
+.enterprise-badge {
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  color: var(--accent);
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
 /* Project Actions */
 .project-cta {
   display: inline-flex;
@@ -781,6 +802,11 @@ section {
 .instantfix-card .project-cta {
   border-color: rgba(34, 211, 238, 0.5);
   color: #22d3ee;
+}
+
+.enterprise-card .project-cta {
+  border-color: rgba(16, 185, 129, 0.5);
+  color: #10b981;
 }
 
 .project-card:hover .project-cta {

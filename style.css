@@ -593,10 +593,18 @@ section {
   color: var(--text);
 }
 
+/* Push the tech line + footer to the bottom so bullets align across cards */
+.project-card p:not(.tech) {
+  flex-grow: 1;
+}
+
 .tech {
   opacity: 0.85;
   font-size: 0.9rem;
   margin-top: 10px;
+  min-height: 2.7em;
+  display: flex;
+  align-items: flex-end;
 }
 
 /* Card Color Variants */
